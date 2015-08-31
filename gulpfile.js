@@ -7,14 +7,7 @@ var source = require('vinyl-source-stream');
 var del = require('del');
 var Karma = require('karma');
 var ghPages = require('gulp-gh-pages');
-
-gulp.task('lint', function() {
-  return gulp.src('./src/**/*.js')
-    .pipe(jscs({
-       esnext: true,
-       preset: 'airbnb'
-     }))
-});
+var webserver = require('gulp-webserver');
 
 gulp.task('babel', function () {
   browserify({
@@ -35,7 +28,7 @@ gulp.task('sass', function () {
 
 
 gulp.task('watch', function() {
-  gulp.watch(['./src/**/*.js'], ['lint','babel']);
+  gulp.watch(['./src/**/*.js'], ['babel']);
   gulp.watch(['./src/scss/*.scss'], ['sass']);
   gulp.watch(['./src/index.html'], ['copy']);
 });
@@ -62,9 +55,17 @@ gulp.task('deploy', function() {
 });
 
 
+gulp.task('webserver', function() {
+  gulp.src('./dist')
+    .pipe(webserver({
+      livereload: true,
+      fallback: 'index.html'
+    }));
+});
+
+
 gulp.task('default', [
   'watch',
-  'lint',
   'babel',
   'sass',
   'copy'
